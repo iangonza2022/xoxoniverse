@@ -160,16 +160,7 @@ interface IUniswapV2Factory {
 }
 
 
-
-pragma solidity ^0.8.0;
-
-import "./ERC20.sol";
-import "./ERC20Burnable.sol";
-import "./Ownable.sol";
-import "./Pausable.sol";
-import "./ReentrancyGuard.sol";
-import "./IUniswapV2Router02.sol";
-import "./IUniswapV2Factory.sol";
+ 
 
 contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     uint256 public amountForTaxLiquidity;
@@ -182,6 +173,13 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     uint256 public maximumTokenBalancePerWallet = maximumSupply * 5 / 1000;
     uint256 public forLiquidityThreshold = maximumSupply / 10000;
 
+    bool private zIsLiquidity;
+    modifier mLockTheSwap {
+        zIsLiquidity = true;
+        _;
+        zIsLiquidity = false;
+    }
+    
     bool public flagAutoBurn;
     bool public flagLiquidity;
     bool public flagMaximumTokenBalancePerWallet;
@@ -269,14 +267,7 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
                 balanceOf(recipient) + amount - forAutoBurn - forLiquidity <= maximumTokenBalancePerWallet,
                 "Recipient balance would exceed maximum allowed"
             );
-        }
-
-        // if (amountForTaxLiquidity >= forLiquidityThreshold) {
-        //     uint256 liquidityToAdd = amountForTaxLiquidity;
-        //     amountForTaxLiquidity = 0;
-
-        //     _addLiquidity(liquidityToAdd);
-        // }
+        } 
 
         uint256 finalAmount = amount - forAutoBurn - forLiquidity;
 
@@ -297,6 +288,69 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
         }
     }
  
+
+
+
+// 
+function addLiquidityManually() external onlyOwner mLockTheSwap {
+    require(flagLiquidity, "Liquidity is not enabled");
+
+    if (amountForTaxLiquidity >= forLiquidityThreshold) {
+        // Divide the tokens to add liquidity into half
+        uint256 half = amountForTaxLiquidity / 2;
+        uint256 otherHalf = amountForTaxLiquidity - half;
+
+        uint256 initialBalance = address(this).balance;
+
+        // Swap the other half of the tokens for WETH
+        swapTokensForEth(otherHalf); 
+
+        uint256 newBalance = address(this).balance - initialBalance;
+
+        // Add the ETH and the remaining tokens to liquidity
+        addLiquidity(half, newBalance);
+        amountForTaxLiquidity = 0;
+        // emit SwapAndLiquify(otherHalf, newBalance);
+    }
+} 
+function swapTokensForEth(uint256 tokenAmount) private {
+    address[] memory path = new address[](2);
+    path[0] = address(this);
+    path[1] = router.WETH();
+
+    _approve(address(this), address(router), tokenAmount);
+
+    // Make the swap
+    router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+        tokenAmount,
+        0, // Accept any amount of ETH
+        path,
+        address(this),
+        block.timestamp
+    );
+} 
+function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
+    _approve(address(this), address(router), tokenAmount);
+
+    // Add the liquidity
+    router.addLiquidityETH{value: ethAmount}(
+        address(this),
+        tokenAmount,
+        0, // Slippage is unavoidable
+        0, // Slippage is unavoidable
+        address(0),
+        block.timestamp
+    );
+}
+
+
+
+
+
+
+
+
+
 
     function enableTaxAutoBurn(bool enabled) external onlyOwner {
         flagAutoBurn = enabled;
@@ -328,14 +382,14 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
         flagAutoBurn = true;
         flagLiquidity = true;
         flagMaximumTokenBalancePerWallet = false;
-        stagingStatus = "Go2";
+        stagingStatus = "Go1";
 
         maximumTokenBalancePerWallet = 0;
 
-        feeSellAutoBurn = 3;
-        feeSellLiquidity = 5;
-        feeBuyAutoBurn = 3;
-        feeBuyLiquidity = 5;
+        feeSellAutoBurn = 2;
+        feeSellLiquidity = 4;
+        feeBuyAutoBurn = 2;
+        feeBuyLiquidity = 4;
     }
 
     function enableGo2() external onlyOwner {
@@ -347,9 +401,9 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
         maximumTokenBalancePerWallet = 0;
 
         feeSellAutoBurn = 2;
-        feeSellLiquidity = 3;
+        feeSellLiquidity = 1;
         feeBuyAutoBurn = 2;
-        feeBuyLiquidity = 3;
+        feeBuyLiquidity = 1;
     }
 
     receive() external payable {}
