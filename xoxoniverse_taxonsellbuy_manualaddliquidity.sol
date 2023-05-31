@@ -182,7 +182,6 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     
     bool public flagAutoBurn;
     bool public flagLiquidity;
-    bool public flagSwap;
     bool public flagMaximumTokenBalancePerWallet;
 
     IUniswapV2Router02 public immutable router;
@@ -191,15 +190,12 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     address public addressForListings;
     address public addressForLiquidity;
 
-    uint public goStatus = 0;
+    string public stagingStatus = "Init";
 
     uint256 public feeSellAutoBurn = 2;
     uint256 public feeSellLiquidity = 8;
     uint256 public feeBuyAutoBurn = 1;
     uint256 public feeBuyLiquidity = 4;
-
-    mapping(address => bool) public whitelist;
-    mapping(address => bool) public blacklist;
 
     event eventTransfer(address indexed from, address indexed to, uint256 value);
 
@@ -213,7 +209,6 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
  
         flagAutoBurn = false;
         flagLiquidity = false;
-        flagSwap = false;
         flagMaximumTokenBalancePerWallet = false;
 
         _mint(msg.sender, tokenomicsForLiquidity);
@@ -242,8 +237,6 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
         uint256 amount
     ) internal override {
         require(amount > 0, "Transfer amount must be greater than zero");
-        require(!_isBlacklisted(sender), "Sender is Blacklisted");
-        require(!_isBlacklisted(recipient), "Recipient is Blacklisted");
 
         // Deduct transfer fees based on the transfer type
         uint256 forAutoBurn = 0;
@@ -251,33 +244,21 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
 
         bool isSell = recipient == uniswapV2Pair;
         bool isBuy = sender == uniswapV2Pair; 
-        bool isSwap = flagSwap;
-        bool isWhiteListed = false;
 
-        if (goStatus == 0 ) {
-            if (_isWhitelisted(sender)) { 
-                isSwap = true; isWhiteListed = true; 
+
+        if (isSell) {
+            if (flagAutoBurn) {
+                forAutoBurn = amount * feeSellAutoBurn / 100;
             }
-            if (_isWhitelisted(sender) && _isWhitelisted(recipient)) { 
-                isSwap = true; isWhiteListed = true; 
+            if (flagLiquidity) {
+                forLiquidity = amount * feeSellLiquidity / 100;
+            } 
+        } else if (isBuy) {
+            if (flagAutoBurn) {
+                forAutoBurn = amount * feeBuyAutoBurn / 100;
             }
-        } else {
-            if (isSell) {
-                require(isSwap, "Swap not yet Enabled");
-                if (flagAutoBurn) {
-                    forAutoBurn = amount * feeSellAutoBurn / 100;
-                }
-                if (flagLiquidity) {
-                    forLiquidity = amount * feeSellLiquidity / 100;
-                } 
-            } else if (isBuy) {
-                require(isSwap, "Swap not yet Enabled");
-                if (flagAutoBurn) {
-                    forAutoBurn = amount * feeBuyAutoBurn / 100;
-                }
-                if (flagLiquidity) {
-                    forLiquidity = amount * feeBuyLiquidity / 100;
-                } 
+            if (flagLiquidity) {
+                forLiquidity = amount * feeBuyLiquidity / 100;
             } 
         }
 
@@ -306,39 +287,71 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
             emit eventTransfer(sender, addressForLiquidity, forLiquidity);
         }
     }
+ 
 
-    function addToWhitelist(address[] calldata addresses) external onlyOwner {
-        for (uint256 i = 0; i < addresses.length; i++) {
-            whitelist[addresses[i]] = true;
-        }
-    }
 
-    function removeFromWhitelist(address[] calldata addresses) external onlyOwner {
-        for (uint256 i = 0; i < addresses.length; i++) {
-            whitelist[addresses[i]] = false;
-        }
-    }
 
-    function addToBlacklist(address[] calldata addresses) external onlyOwner {
-        for (uint256 i = 0; i < addresses.length; i++) {
-            blacklist[addresses[i]] = true;
-        }
-    }
+// 
+function addLiquidityManually() external onlyOwner mLockTheSwap {
+    require(flagLiquidity, "Liquidity is not enabled");
 
-    function removeFromBlacklist(address[] calldata addresses) external onlyOwner {
-        for (uint256 i = 0; i < addresses.length; i++) {
-            blacklist[addresses[i]] = false;
-        }
-    }
+    if (amountForTaxLiquidity >= forLiquidityThreshold) {
+        // Divide the tokens to add liquidity into half
+        uint256 half = amountForTaxLiquidity / 2;
+        uint256 otherHalf = amountForTaxLiquidity - half;
 
-    function _isWhitelisted(address account) internal view returns (bool) {
-        return whitelist[account];
-    }
+        uint256 initialBalance = address(this).balance;
 
-    function _isBlacklisted(address account) internal view returns (bool) {
-        return blacklist[account];
+        // Swap the other half of the tokens for WETH
+        swapTokensForEth(otherHalf); 
+
+        uint256 newBalance = address(this).balance - initialBalance;
+
+        // Add the ETH and the remaining tokens to liquidity
+        addLiquidity(half, newBalance);
+        amountForTaxLiquidity = 0;
+        // emit SwapAndLiquify(otherHalf, newBalance);
     }
-    
+} 
+function swapTokensForEth(uint256 tokenAmount) private {
+    address[] memory path = new address[](2);
+    path[0] = address(this);
+    path[1] = router.WETH();
+
+    _approve(address(this), address(router), tokenAmount);
+
+    // Make the swap
+    router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+        tokenAmount,
+        0, // Accept any amount of ETH
+        path,
+        address(this),
+        block.timestamp
+    );
+} 
+function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
+    _approve(address(this), address(router), tokenAmount);
+
+    // Add the liquidity
+    router.addLiquidityETH{value: ethAmount}(
+        address(this),
+        tokenAmount,
+        0, // Slippage is unavoidable
+        0, // Slippage is unavoidable
+        address(0),
+        block.timestamp
+    );
+}
+
+
+
+
+
+
+
+
+
+
     function enableTaxAutoBurn(bool enabled) external onlyOwner {
         flagAutoBurn = enabled;
     }
@@ -354,9 +367,8 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     function enableGo0() external onlyOwner {
         flagAutoBurn = false;
         flagLiquidity = false;
-        flagSwap = false;
         flagMaximumTokenBalancePerWallet = false;
-        goStatus = 0;
+        stagingStatus = "Go0";
 
         maximumTokenBalancePerWallet = 0;
 
@@ -369,9 +381,8 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     function enableGo1() external onlyOwner {
         flagAutoBurn = true;
         flagLiquidity = true;
-        flagSwap = true;
         flagMaximumTokenBalancePerWallet = false;
-        goStatus = 100;
+        stagingStatus = "Go1";
 
         maximumTokenBalancePerWallet = 0;
 
@@ -384,9 +395,8 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     function enableGo2() external onlyOwner {
         flagAutoBurn = true;
         flagLiquidity = true;
-        flagSwap = true;
         flagMaximumTokenBalancePerWallet = false;
-        goStatus = 200;
+        stagingStatus = "Go2";
 
         maximumTokenBalancePerWallet = 0;
 
