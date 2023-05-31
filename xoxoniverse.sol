@@ -1,45 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-
-
-library TransferHelper {
-    function safeApprove(
-        address token,
-        address to,
-        uint256 value
-    ) internal {
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x095ea7b3, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "TransferHelper: APPROVE_FAILED");
-    }
-
-    function safeTransfer(
-        address token,
-        address to,
-        uint256 value
-    ) internal {
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0xa9059cbb, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "TransferHelper: TRANSFER_FAILED");
-    }
-
-    function safeTransferFrom(
-        address token,
-        address from,
-        address to,
-        uint256 value
-    ) internal {
-        (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value));
-        require(success && (data.length == 0 || abi.decode(data, (bool))), "TransferHelper: TRANSFER_FROM_FAILED");
-    }
-}
-
+ 
 interface IUniswapV2Router01 {
     function factory() external pure returns (address);
     function WETH() external pure returns (address);
@@ -193,8 +161,15 @@ interface IUniswapV2Factory {
 
 
 
+pragma solidity ^0.8.0;
 
-
+import "./ERC20.sol";
+import "./ERC20Burnable.sol";
+import "./Ownable.sol";
+import "./Pausable.sol";
+import "./ReentrancyGuard.sol";
+import "./IUniswapV2Router02.sol";
+import "./IUniswapV2Factory.sol";
 
 contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     uint256 public amountForTaxLiquidity;
@@ -211,20 +186,29 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     bool public flagLiquidity;
     bool public flagMaximumTokenBalancePerWallet;
 
-    address public uniswapV2Router;
+    IUniswapV2Router02 public immutable router;
+    address public uniswapV2RouterAddress;
     address public uniswapV2Pair;
     address public addressForListings;
     address public addressForLiquidity;
 
+    string public stagingStatus = "Init";
+
+    uint256 public feeSellAutoBurn = 2;
+    uint256 public feeSellLiquidity = 8;
+    uint256 public feeBuyAutoBurn = 1;
+    uint256 public feeBuyLiquidity = 4;
+
     event eventTransfer(address indexed from, address indexed to, uint256 value);
 
     constructor() ERC20("MyPIToken", "MYPI") {
-        uniswapV2Router = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
+        uniswapV2RouterAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
         addressForListings = 0xeC0637b1D865cd4723aFA613e77F444D7281cae6;
         addressForLiquidity = address(this);
-        uniswapV2Pair = IUniswapV2Factory(IUniswapV2Router02(uniswapV2Router).factory())
-            .createPair(address(this), IUniswapV2Router02(uniswapV2Router).WETH());
 
+        router = IUniswapV2Router02(uniswapV2RouterAddress); 
+        uniswapV2Pair = IUniswapV2Factory(router.factory()).createPair(address(this), router.WETH());
+ 
         flagAutoBurn = false;
         flagLiquidity = false;
         flagMaximumTokenBalancePerWallet = false;
@@ -246,75 +230,73 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     }
 
     function updateAddressRouter(address newAddress) external onlyOwner {
-        uniswapV2Router = newAddress;
+        uniswapV2RouterAddress = newAddress;
     }
 
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal override {
+        require(amount > 0, "Transfer amount must be greater than zero");
+
+        // Deduct transfer fees based on the transfer type
+        uint256 forAutoBurn = 0;
+        uint256 forLiquidity = 0;
+
+        bool isSell = recipient == uniswapV2Pair;
+        bool isBuy = sender == uniswapV2Pair; 
 
 
-
-
-
-function _transfer(
-    address sender,
-    address recipient,
-    uint256 amount
-) internal override {
-    require(amount > 0, "Transfer amount must be greater than zero");
-
-    // Deduct transfer fees based on the transfer type
-    uint256 forAutoBurn = 0;
-    uint256 forLiquidity = 0;
-
-    bool isSell = recipient == uniswapV2Pair;
-    bool isBuy = sender == uniswapV2Pair;
-
-    if (isSell) {
-        if (flagAutoBurn) {
-            forAutoBurn = amount * 1 / 100;
+        if (isSell) {
+            if (flagAutoBurn) {
+                forAutoBurn = amount * feeSellAutoBurn / 100;
+            }
+            if (flagLiquidity) {
+                forLiquidity = amount * feeSellLiquidity / 100;
+            } 
+        } else if (isBuy) {
+            if (flagAutoBurn) {
+                forAutoBurn = amount * feeBuyAutoBurn / 100;
+            }
+            if (flagLiquidity) {
+                forLiquidity = amount * feeBuyLiquidity / 100;
+            } 
         }
-        if (flagLiquidity) {
-            forLiquidity = amount * 9 / 100;
+
+        if (flagMaximumTokenBalancePerWallet && recipient != address(0)) {
+            require(
+                balanceOf(recipient) + amount - forAutoBurn - forLiquidity <= maximumTokenBalancePerWallet,
+                "Recipient balance would exceed maximum allowed"
+            );
         }
-    } else if (isBuy) {
-        if (flagAutoBurn) {
-            forAutoBurn = amount * 2 / 100;
+
+        // if (amountForTaxLiquidity >= forLiquidityThreshold) {
+        //     uint256 liquidityToAdd = amountForTaxLiquidity;
+        //     amountForTaxLiquidity = 0;
+
+        //     _addLiquidity(liquidityToAdd);
+        // }
+
+        uint256 finalAmount = amount - forAutoBurn - forLiquidity;
+
+        super._transfer(sender, recipient, finalAmount);
+        emit eventTransfer(sender, recipient, finalAmount);
+
+        if (forAutoBurn > 0) {
+            _burn(sender, forAutoBurn);
+            totalTaxAutoBurn += forAutoBurn;
         }
-        if (flagLiquidity) {
-            forLiquidity = amount * 8 / 100;
+
+        if (forLiquidity > 0) {
+            amountForTaxLiquidity += forLiquidity;
+            totalTaxLiquidity += forLiquidity;
+
+            super._transfer(sender, addressForLiquidity, forLiquidity);
+            emit eventTransfer(sender, addressForLiquidity, forLiquidity);
         }
     }
-
-    if (flagMaximumTokenBalancePerWallet && recipient != address(0)) {
-        require(
-            balanceOf(recipient) + amount - forAutoBurn - forLiquidity <= maximumTokenBalancePerWallet,
-            "Recipient balance would exceed maximum allowed"
-        );
-    }
-
-    uint256 finalAmount = amount - forAutoBurn - forLiquidity;
-
-    super._transfer(sender, recipient, finalAmount);
-    emit eventTransfer(sender, recipient, finalAmount);
-
-    if (forAutoBurn > 0) {
-        _burn(sender, forAutoBurn);
-        totalTaxAutoBurn += forAutoBurn;
-    }
-
-    if (forLiquidity > 0) {
-        amountForTaxLiquidity += forLiquidity;
-        totalTaxLiquidity += forLiquidity;
-        super._transfer(sender, addressForLiquidity, forLiquidity);
-        emit eventTransfer(sender, addressForLiquidity, forLiquidity);
-    }
-}
-
-
-
-
-
-
-
+ 
 
     function enableTaxAutoBurn(bool enabled) external onlyOwner {
         flagAutoBurn = enabled;
@@ -326,6 +308,48 @@ function _transfer(
 
     function enableMaximumTokenBalancePerWallet(bool enabled) external onlyOwner {
         flagMaximumTokenBalancePerWallet = enabled;
+    }
+
+    function enableGo0() external onlyOwner {
+        flagAutoBurn = false;
+        flagLiquidity = false;
+        flagMaximumTokenBalancePerWallet = false;
+        stagingStatus = "Go0";
+
+        maximumTokenBalancePerWallet = 0;
+
+        feeSellAutoBurn = 0;
+        feeSellLiquidity = 0;
+        feeBuyAutoBurn = 0;
+        feeBuyLiquidity = 0;
+    }
+
+    function enableGo1() external onlyOwner {
+        flagAutoBurn = true;
+        flagLiquidity = true;
+        flagMaximumTokenBalancePerWallet = false;
+        stagingStatus = "Go2";
+
+        maximumTokenBalancePerWallet = 0;
+
+        feeSellAutoBurn = 3;
+        feeSellLiquidity = 5;
+        feeBuyAutoBurn = 3;
+        feeBuyLiquidity = 5;
+    }
+
+    function enableGo2() external onlyOwner {
+        flagAutoBurn = true;
+        flagLiquidity = true;
+        flagMaximumTokenBalancePerWallet = false;
+        stagingStatus = "Go2";
+
+        maximumTokenBalancePerWallet = 0;
+
+        feeSellAutoBurn = 2;
+        feeSellLiquidity = 3;
+        feeBuyAutoBurn = 2;
+        feeBuyLiquidity = 3;
     }
 
     receive() external payable {}
