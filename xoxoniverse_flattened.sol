@@ -1312,17 +1312,16 @@ interface IUniswapV2Factory {
 
 
 
-
-
-
-
-
-
+ 
 
 /*
 total supply: 250T 
     93% for liquidity
-    6% for listings
+    7% for listings
+
+No Team Token
+No Dev Token
+No Presale
 
 buy and sell tax 
     auto burn up to max autoburn
@@ -1332,7 +1331,7 @@ with max amount per wallet in early stage only
 whitelist are also for early stage only
 blocklist
 on the stage 3 we will renounce contract ownership
-setter = used to change stages and to maange blocklisted accounts for security purposes
+setter = used to change stages and to manage blocklisted accounts for security purposes
 
 Stage 0 - initial liquidity, no swap
 Stage 1 - swap is for whitelisted only with limit per wallet
@@ -1413,7 +1412,7 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
 
     uint256 public maxSup = 250000000 * 10**decimals();
     uint256 public tokForLiq = maxSup * 93 / 100; // 93% of maxSup 
-    uint256 public tokForLis = maxSup - tokForLiq; // 6% of maxSup 
+    uint256 public tokForLis = maxSup - tokForLiq; // 7% of maxSup 
     uint256 public maxTokForAutBur = (maxSup * 1) / 1000; // 0.1% of maxSup 
     uint256 public maxTokBalPerWal = (maxSup * 5) / 1000; // 0.5% of maxSup
     uint256 public forLiqThrHol = (maxSup * 2) / 1000; // 0.2% of maxSup
@@ -1505,7 +1504,6 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     ) internal override {
         require(amount > 0, "Transfer amount must be greater than zero");
 
-        // Deduct transfer fees based on the transfer type
         uint256 forAutoBurn = 0;
         uint256 forLiquidity = 0;
 
@@ -1558,27 +1556,22 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
  
 
 
-
-// 
+ 
 function addLiquidityManually() external onlySetter lockTheSwap {
     require(flaLiq, "Liquidity is not enabled");
 
     if (amoForTaxLiq >= forLiqThrHol) {
-        // Divide the tokens to add liquidity into half
         uint256 half = amoForTaxLiq / 2;
         uint256 otherHalf = amoForTaxLiq - half;
 
         uint256 initialBalance = address(this).balance;
 
-        // Swap the other half of the tokens for WETH
         swapTokensForEth(otherHalf); 
 
         uint256 newBalance = address(this).balance - initialBalance;
 
-        // Add the ETH and the remaining tokens to liquidity
         addLiquidity(half, newBalance);
         amoForTaxLiq = 0;
-        // emit SwapAndLiquify(otherHalf, newBalance);
     }
 } 
 function swapTokensForEth(uint256 tokenAmount) private {
@@ -1588,10 +1581,9 @@ function swapTokensForEth(uint256 tokenAmount) private {
 
     _approve(address(this), address(rou), tokenAmount);
 
-    // Make the swap
     rou.swapExactTokensForETHSupportingFeeOnTransferTokens(
         tokenAmount,
-        0, // Accept any amount of ETH
+        0, 
         path,
         address(this),
         block.timestamp
@@ -1600,12 +1592,11 @@ function swapTokensForEth(uint256 tokenAmount) private {
 function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
     _approve(address(this), address(rou), tokenAmount);
 
-    // Add the liquidity
     rou.addLiquidityETH{value: ethAmount}(
         address(this),
         tokenAmount,
-        0, // Slippage is unavoidable
-        0, // Slippage is unavoidable
+        0,
+        0,
         address(0),
         block.timestamp
     );
@@ -1649,15 +1640,6 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         return blaLis[account];
     }
     
-
-
-
-
-
-
-
-
-
     function enableTaxAutoBurn(bool enabled) external onlySetter {
         flaAutBur = enabled;
     }
@@ -1669,6 +1651,10 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
     function enableMaximumTokenBalancePerWallet(bool enabled) external onlySetter {
         flaMaxTokBalPerWal = enabled;
     }
+
+
+
+
 
     function enableGo0() external onlySetter {
         flaAutBur = false;
