@@ -162,6 +162,99 @@ interface IUniswapV2Factory {
 
  
 
+
+
+
+
+
+ 
+
+/*
+total supply: 250T 
+    93% for liquidity
+    7% for listings
+
+Stealth Launch
+No Team Token
+No Dev Token
+No Presale
+With Taxes (but taxes for the benefit the community) 
+With Max Amount per Wallet (in early stage only)
+Whitelist (in early stage only)
+Blocklist (to remove some bots)
+Renounced Contract Ownership (on the stage 3)
+setter = they can stages and manage blocklisted accounts for security purposes
+
+buy and sell tax 
+    auto burn up to max autoburn
+    addliquidity and lp are burned automatically
+
+
+Stage 0 - initial liquidity, no swap
+Stage 1 - swap is for whitelisted only with limit per wallet
+Stage 2 - swap is open with limit per wallet
+Stage 3 - swap is open without limit, contract ownership is renounced
+
+Stage 0 - initial liquidity
+        flaAutBur = false;
+        flaLiq = false;
+        flaSwa = false;
+        flaMaxTokBalPerWal = false;
+        staGo = 0;
+
+        maxTokBalPerWal = maxTokBalPerWal = 0;
+
+        feeSelAutBur = 0;
+        feeSelLiq = 0;
+        feeBuyAutBur = 0;
+        feeBuyLiq = 0;
+
+Stage 1 - whitelisted with limit per wallet
+        flaAutBur = false;
+        flaLiq = false;
+        flaSwa = false;
+        flaMaxTokBalPerWal = true;
+        staGo = 1;
+
+        maxTokBalPerWal = maxTokBalPerWal = (maxSup * 5) / 1000; // 0.5% of maxSup
+
+        feeSelAutBur = 0;
+        feeSelLiq = 0;
+        feeBuyAutBur = 0;
+        feeBuyLiq = 0;
+
+Stage 2 - open with limit per wallet
+        flaAutBur = true;
+        flaLiq = true;
+        flaSwa = true;
+        flaMaxTokBalPerWal = true;
+        staGo = 2;
+
+        maxTokBalPerWal = maxTokBalPerWal = (maxSup * 5) / 1000; // 0.5% of maxSup
+
+        feeSelAutBur = 2;
+        feeSelLiq = 1;
+        feeBuyAutBur = 2;
+        feeBuyLiq = 1;
+
+Stage 3 - open no limit, contract is renounced
+        flaAutBur = true;
+        flaLiq = true;
+        flaSwa = true;
+        flaMaxTokBalPerWal = false;
+        staGo = 3;
+
+        maxTokBalPerWal = 0;
+
+        feeSelAutBur = 2;
+        feeSelLiq = 1;
+        feeBuyAutBur = 2;
+        feeBuyLiq = 1;
+*/
+
+
+
+
 contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     uint256 public amountForTaxLiquidity;
     uint256 public totalTaxLiquidity;
@@ -202,6 +295,7 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
     mapping(address => bool) public blacklist;
 
     event eventTransfer(address indexed from, address indexed to, uint256 value);
+    event eventAddLiquidity(uint256 value);
 
     constructor() ERC20("MyPIToken", "MYPI") {
         uniswapV2RouterAddress = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
@@ -257,10 +351,8 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, ReentrancyGuard {
         if (goStatus == 0 ) {
             if (_isWhitelisted(sender)) { 
                 isSwap = true; isWhiteListed = true; 
-            }
-            if (_isWhitelisted(sender) && _isWhitelisted(recipient)) { 
-                isSwap = true; isWhiteListed = true; 
-            }
+            } 
+            require(isSwap, "Swap not yet Enabled");
         } else {
             if (isSell) {
                 require(isSwap, "Swap not yet Enabled");

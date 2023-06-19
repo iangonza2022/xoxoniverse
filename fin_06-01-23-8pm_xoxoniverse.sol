@@ -253,13 +253,6 @@ Stage 3 - open no limit, contract is renounced
 
 
 
-/*
-batch minting
-premiun connect
-premium rewards
-
-*/
-
 
 
 contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, ReentrancyGuard {
@@ -267,12 +260,12 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, Re
     uint256 public totTaxLiq;
     uint256 public totTaxAutBur;
 
-    uint256 public maxSup = 250000000 * 10**decimals();
+    uint256 public maxSup = 250000000 * 10**decimals(); 
     uint256 public tokForLiq = maxSup * 93 / 100; // 93% of maxSup 
     uint256 public tokForLis = maxSup - tokForLiq; // 7% of maxSup 
     uint256 public maxTokForAutBur = (maxSup * 1) / 1000; // 0.1% of maxSup 
-    uint256 public maxTokBalPerWal = (maxSup * 5) / 1000; // 0.5% of maxSup
-    uint256 public forLiqThrHol = (maxSup * 2) / 1000; // 0.2% of maxSup
+    uint256 public maxTokBalPerWal = (maxSup * 5) / 1000; // 0.5% of maxSup 
+    uint256 public forLiqThrHol = (maxSup * 2) / 1000; // 0.2% of maxSup 
 
     bool private isLiquidity;
     modifier lockTheSwap {
@@ -301,13 +294,16 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, Re
     mapping(address => bool) public whiLis;
     mapping(address => bool) public blaLis;
 
-    event eventBurnTax(address indexed from, uint256 value);
-    event eventLiquidityTax(address indexed from, uint256 value);
-    event eventTransfer(address indexed from, address indexed to, uint256 value);
-    event eventAddLiquidity(uint256 half, uint256 otherhalf);
-    event eventStatusRun(uint256 status);
-    event eventRoleGranted(bytes32 indexed role, bool account, address indexed sender);
-    event eventRoleRevoked(bytes32 indexed role, bool account, address indexed sender);
+    event eveBurTax(address indexed from, uint256 value);
+    event eveLiqTax(address indexed from, uint256 value);
+    event eveTra(address indexed from, address indexed to, uint256 value);
+    event eveSel(address indexed from, address indexed to, uint256 value);
+    event eveBuy(address indexed from, address indexed to, uint256 value);
+    event eveAddLiq(uint256 half, uint256 otherhalf);
+    event eveStaRun(uint256 status);
+    event eveRolGra(bytes32 indexed role, bool account, address indexed sender);
+    event eveRolRev(bytes32 indexed role, bool account, address indexed sender);
+
      
     bytes32 public constant MASTER_ROLE = keccak256("MASTER_ROLE");
     bytes32 public constant SETTER_ROLE = keccak256("SETTER_ROLE");
@@ -317,15 +313,11 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, Re
     constructor() ERC20("MyPIToken", "MYPI") {
         rouV2Add = 0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506;
         addForLis = 0xeC0637b1D865cd4723aFA613e77F444D7281cae6;
-        addForLiq = address(this); 
+        addForLiq = address(this);
 
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); 
-        _grantRole(SETTER_ROLE, msg.sender);
-        _grantRole(LIST_ROLE, msg.sender);
-        _grantRole(LIQUIDITY_ROLE, msg.sender);
-
-        rou = IUniswapV2Router02(rouV2Add); 
+        rou = IUniswapV2Router02(rouV2Add);
         rouV2Pai = IUniswapV2Factory(rou.factory()).createPair(address(this), rou.WETH());
+    
  
         flaAutBur = false;
         flaLiq = false;
@@ -337,16 +329,28 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, Re
 
         _mint(msg.sender, tokForLiq);
         _mint(addForLis, tokForLis); 
+ 
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); 
+        _grantRole(SETTER_ROLE, msg.sender);
+        _grantRole(LIST_ROLE, msg.sender);
+        _grantRole(LIQUIDITY_ROLE, msg.sender);
     } 
+
+
+
+
+
+
+
 
     /* SETTER_ROLE, LIST_ROLE, LIQUIDITY_ROLE */
     function manageRole(bytes32 newRole, address newAddress, bool newBool) external onlyRole(DEFAULT_ADMIN_ROLE) {
         if (newBool) {
             _grantRole(newRole, newAddress);
-            emit eventRoleGranted(newRole, newBool, newAddress);
+            emit eveRolGra(newRole, newBool, newAddress);
         } else {
             _revokeRole(newRole, newAddress);
-            emit eventRoleRevoked(newRole, newBool, newAddress);
+            emit eveRolRev(newRole, newBool, newAddress);
         }
     }
 
@@ -401,45 +405,36 @@ contract MyPIToken is ERC20, ERC20Burnable, Ownable, Pausable, AccessControl, Re
  
         if (totTaxAutBur >= maxTokForAutBur) { flaAutBur = false; isAutBur = flaAutBur; }
 
-        if (staRun == 0) {
+        if (staRun <= 1) {
             if (_isWhitelisted(sender)) { isSwap = true; } 
             if (_isWhitelisted(recipient)) { isSwap = true; } 
-            if (!isSwap) { require(isSwap, "Swap not yet Enabled"); }
+            if (isSell) { require(isSwap,"Swap not yet Enabled"); }
+            if (isBuy) { require(isSwap,"Swap not yet Enabled"); }
         } else {
-            if (isSell) {
-                if (isAutBur) { forAutoBurn = amount * feeSelAutBur / 100; }
-                if (flaLiq) { forLiquidity = amount * feeSelLiq / 100; } 
-            } else if (isBuy) {
-                if (isAutBur) { forAutoBurn = amount * feeBuyAutBur / 100; }
-                if (flaLiq) { forLiquidity = amount * feeBuyLiq / 100; } 
-            }
+            if (isSell) { if (isAutBur) { forAutoBurn = amount * feeSelAutBur / 100; } if (flaLiq) { forLiquidity = amount * feeSelLiq / 100; } } 
+            if (isBuy) { if (isAutBur) { forAutoBurn = amount * feeBuyAutBur / 100; } if (flaLiq) { forLiquidity = amount * feeBuyLiq / 100; } }
         }
 
-        if (flaMaxTokBalPerWal && recipient != address(0)) {
-            require(
-                balanceOf(recipient) + amount - forAutoBurn - forLiquidity <= maxTokBalPerWal,
-                "Recipient Balance would Exceed Maximum Allowed"
-            );
-        } 
+        if (flaMaxTokBalPerWal && recipient != address(0)) { require( balanceOf(recipient) + amount - forAutoBurn - forLiquidity <= maxTokBalPerWal, "Recipient Balance would Exceed Maximum Allowed" ); } 
 
         uint256 finalAmount = amount - forAutoBurn - forLiquidity;
 
         super._transfer(sender, recipient, finalAmount);
-        emit eventTransfer(sender, recipient, finalAmount);
+        emit eveTra(sender, recipient, finalAmount);
 
         if (forAutoBurn > 0) {
             _burn(sender, forAutoBurn);
             totTaxAutBur += forAutoBurn;
-            emit eventBurnTax(sender, forAutoBurn);
+            emit eveBurTax(sender, forAutoBurn);
         }
 
         if (forLiquidity > 0) {
             amoForTaxLiq += forLiquidity;
             totTaxLiq += forLiquidity;
-            emit eventLiquidityTax(sender, forAutoBurn);
+            emit eveLiqTax(sender, forAutoBurn);
 
             super._transfer(sender, addForLiq, forLiquidity);
-            emit eventTransfer(sender, addForLiq, forLiquidity);
+            emit eveTra(sender, addForLiq, forLiquidity);
         }
     }
  
@@ -461,7 +456,7 @@ function addLiquidityManually() external onlyRole(LIQUIDITY_ROLE) lockTheSwap {
 
         addLiquidity(half, newBalance);
         amoForTaxLiq = 0;
-        emit eventAddLiquidity(half, newBalance);
+        emit eveAddLiq(half, newBalance);
 
     }
 } 
@@ -553,7 +548,7 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         feeSelLiq = 0;
         feeBuyAutBur = 0;
         feeBuyLiq = 0;
-        emit eventStatusRun(staRun);
+        emit eveStaRun(staRun);
     }
 
     function enableRun1() external onlyRole(SETTER_ROLE) {
@@ -569,7 +564,7 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         feeSelLiq = 0;
         feeBuyAutBur = 0;
         feeBuyLiq = 0;
-        emit eventStatusRun(staRun);
+        emit eveStaRun(staRun);
     }
 
     function enableRun2() external onlyRole(SETTER_ROLE) {
@@ -585,9 +580,9 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         feeSelLiq = 4;
         feeBuyAutBur = 2;
         feeBuyLiq = 4;
-        emit eventStatusRun(staRun);
+        emit eveStaRun(staRun);
     }
-
+    
     function enableRun3() external onlyRole(SETTER_ROLE) {
         flaAutBur = true;
         flaLiq = true;
@@ -601,7 +596,7 @@ function addLiquidity(uint256 tokenAmount, uint256 ethAmount) private {
         feeSelLiq = 1;
         feeBuyAutBur = 2;
         feeBuyLiq = 1;
-        emit eventStatusRun(staRun);
+        emit eveStaRun(staRun);
     }
 
     receive() external payable {}

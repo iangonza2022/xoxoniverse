@@ -1,0 +1,154 @@
+
+Solce Captcha
+Click below the request captcha.
+Note. You must solve a captcha to get access to the test of Opensea!
+
+
+
+Captcha Authentication
+You have 1 minute to solve this Captcha.
+You will only get 1 try per captcha.
+
+
+
+Your account must be at least 5 minutes old to send messages in this server.
+
+
+
+5 ways to become mysterious
+
+1 be calm
+2 talk less show result
+3 avoid drama
+4 make eye contact
+5 be less reactive
+
+millionares advice
+
+elon musk
+take the risk in your life
+
+bill gates
+be your own boss
+
+jeff bezos
+execute your ideas
+
+mark zuckerberg
+have clear goals
+
+0x23149682C9E007DEBe70eF8910675b8aC66c8c5f <--- setter
+1rlr
+pen media domain box waste useful queen matter liar shadow depend main hair captain lot
+
+/*
+
+8916500000000
+250000000000
+
+    yAddress0; // yWhitelistedAddresses
+    yAddress1; // yBlocklistedAddresses
+    yAddress2; // yTaxExemptedAddresses
+    yAddress3; // yTaskSetterAddresses
+    yAddress4; // yTaskLiquidityAddresses
+    yAddress5; // yTaskPauserAddresses
+    yAddress6; // yNoMaxWalletAddresses
+    yAddress7; // yLastBuy
+  
+    yFlag0; // t yFlaTaxLiquidity
+    yFlag1; // t yFlaTaxBurn
+    yFlag2; // yFlaSwap
+    yFlag3; // yFlaMaxTokenWallet
+    yFlag4; // yFlaBuyCooldownTime
+    yFlag5; // f addtolp
+    yFlag6; // t addtolp
+    
+    YVAR0; // yMaxSupply
+    YVAR1; // yMaxTokenWallet
+    YVAR2; // ySupLiquidity
+    YVAR3; // ySupListings
+    YVAR4; // yMaxTokenToBurn
+    yVar5; // zForLiquidityTreshold
+ 
+    if index == 0 
+        ["250000000000000000000000000000000", "250000000000000000000000000000", "232500000000000000000000000000000", "17500000000000000000000000000000", "175000000000000000000000000000000", "1000000000000000000000"]
+        initial lp
+        send lp to 0x0000000000000000000000000000000000000001 or to
+        send lp to 0x000000000000000000000000000000000000dEaD
+        call renounceOwnership 
+        yAddress3 zSetAddresses 3, ["0xeC"], [true]
+        yAddress4 zSetAddresses 4, ["0xeC"], [true]
+        yAddress5 zSetAddresses 5, ["0xeC"], [true]
+        yAddress6 zSetAddresses 6, ["0xeC"], [true]
+        [0,1,5,6] = [true,true,false,true]
+            yFlag0 zSetBool 0 true
+            yFlag1 zSetBool 1 true
+            yFlag5 zSetBool 5 false
+            yFlag6 zSetBool 6 true
+    if index == 1 
+        yAddress0 zSetAddresses 0, ["0xeC"], [true]
+    if index == 2 
+ 
+    IUniswapV2Router02 _router = IUniswapV2Router02(0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506); // mumbai testnet
+    IUniswapV2Router02 _router = IUniswapV2Router02(0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff); // polygon mainnet
+    IUniswapV2Router02 _router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E); // bnb mainnet
+    IUniswapV2Router02 _router = IUniswapV2Router02(0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f); // eth mainnet
+
+
+    PHISHING WARNING: please make sure you're visiting https://pancakeswap.finance - check the URL carefully.
+ 
+
+    https://rpc-mumbai.matic.today
+    https://rpc-mumbai.maticvigil.com/
+*/ 
+
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.7.0 <0.9.0;
+
+/** 
+ * @title Ballot
+ * @dev Implements voting process along with vote delegation
+ */
+contract Ballot {
+ 
+    uint256 private immutable YMAXSUPPLY;
+    uint256 public immutable YMAXTOKENWALLET;
+    uint256 private immutable YSUPLIQUIDITY;
+    uint256 private immutable YSUPLISTINGS;
+    uint256 private immutable YMAXTOKENTOBURN;
+    uint256 public zForLiquidityTreshold;
+    uint256 public zStaStage;
+    constructor() { 
+        YMAXSUPPLY = 250_000_000_000_000 * 10**18;
+        YMAXTOKENWALLET = YMAXSUPPLY * 1 / 1000;
+        YSUPLIQUIDITY = YMAXSUPPLY * 93 / 100;
+        YSUPLISTINGS = YMAXSUPPLY - YSUPLIQUIDITY; 
+        YMAXTOKENTOBURN = YMAXSUPPLY * 70 / 100;
+        zForLiquidityTreshold = 1000 * 10**18;
+        // ["250000000000000000000000000000000", "250000000000000000000000000000", "232500000000000000000000000000000", "17500000000000000000000000000000", "175000000000000000000000000000000", "1000000000000000000000"]
+    } 
+    function showData() public view returns (uint256 a, uint256 b, uint256 c, uint256 d, uint256 e, uint256 f ) {
+        return (YMAXSUPPLY,YMAXTOKENWALLET,YSUPLIQUIDITY,YSUPLISTINGS,YMAXTOKENTOBURN,zForLiquidityTreshold);
+    }
+
+}
+
+/*
+
+
+
+
+
+
+*/
+
+/*
+250000000000000000000000000000000
+250000000000000000000000000000
+232500000000000000000000000000000
+17500000000000000000000000000000
+175000000000000000000000000000000
+1000000000000000000000
+*/
+

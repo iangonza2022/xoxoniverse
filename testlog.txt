@@ -1,0 +1,47 @@
+https://mumbai.polygonscan.com/token/0%20xdcbed9d5e03f07e61fa09f6de83482b16538a7d1
+
+    stage 0
+
+set bool 0,1,5,6 t,t,f,t
+test swap if < max = n
+test swap if = max = n
+test swap if > max = n
+
+set state 1
+
+    stage 1 
+
+test buy swap if < max = n
+test buy swap if = max = n
+test buy swap if > max = n
+
+set whitelist 0x d
+check if whitelisted address is t d
+
+for whitelisted address
+test buy swap if < max = y
+test buy swap if = max = y
+test buy swap if > max = n
+tax ab = y
+tax atlpw = y
+test sell swap = y
+autolp on sell = y
+
+for whitelisted address
+test buy swap if < max = n
+test buy swap if = max = n
+test buy swap if > max = n
+
+set state 2
+ 
+        Max Token per Wallet is on [250 Billion]
+        Buy Tax = 3% (1% Auto Burn, 2% for Liquidity)
+        Sell Tax = 8% (2% Auto Burn, 6% for Liquidity)
+        1,000 Plus Holders 
+        Listings 
+        Wwnership will be Renounced 
+    Stage 2 
+        Max Token per Wallet is on [250 Billion]
+        Buy Tax = 3% (2% auto burn, 1% for Liquidity)
+        Sell Tax = 3% (2% auto burn, 1% for Liquidity)
+        10,000 Plus Holders 
