@@ -1,0 +1,95 @@
+
+https://sites.google.com/view/turbotoad
+
+
+$TURBO	
+HomeWhitepaper	
+Turbo Token
+
+Welcome to Turbo - The Future of Meme Coins! 🐸
+Turbo Token (TURBO) is a revolutionary meme coin featuring our futuristic toad mascot. Hop on board and join the ride! 
+Turbo Token began as a bold experiment in cryptocurrency creation. Inspired by the power of artificial intelligence, the project's founder turned to GPT-4 with a simple challenge: create the next great meme coin, starting with a budget of just $69. Confident in the AI's abilities, the founder pledged to follow all instructions provided by GPT-4 and document the process.
+
+Driven by the innovative insights of GPT-4 and fueled by the enthusiasm of its community, Turbo Token has come a long way from its humble beginnings. 
+Today, the token stands as a testament to the power of AI-guided creativity, and the potential it holds for reshaping the world of cryptocurrency. 
+As we continue our journey, we invite you to join us in exploring the exciting possibilities that lie ahead for Turbo Token and its community.
+
+
+
+Tokenomics
+Turbo Token follows a unique tokenomics model to ensure a fair and successful distribution:
+
+No taxes
+Crowdfunded launch
+Fairly distributed
+Contract renounced
+
+
+View our whitepaper for a more detailed breakdown of our tokenomics.
+
+
+How to buy
+To buy Turbo Token, follow these simple steps:
+
+Step 1: Download and set up a compatible wallet, such as MetaMask or Trust Wallet.
+
+Step 2: Purchase Ethereum (ETH) on a cryptocurrency exchange and transfer it to your wallet.
+
+Step 3: Visit a decentralized exchange like Uniswap and connect your wallet.
+
+Step 4: Select Turbo Token (TURBO) as the desired token and enter the amount you'd like to buy. The official token address to import is 0xA35923162C49cF95e6BF26623385eb431ad920D3
+
+Step 5: Review the transaction details, confirm the swap, and enjoy your Turbo Token!
+
+*Please note that trading fees and slippage may apply during the purchase process.
+
+
+
+
+Roadmap
+Our roadmap showcases the milestones we aim to achieve. Please be aware this is a list of desires and there is no development team behind Turbo, it's all community driven:
+
+Q2 2023:
+Token creation and smart contract development
+
+Website launch
+
+Community building and marketing campaign
+
+
+Q3 2023:
+Anything can happen.
+
+
+FAQS
+Q: How do I buy Turbo Token (TURBO)?
+
+A: Follow the steps outlined in the 'How to Buy' section above.
+
+Q: What wallet should I use to store TURBO?
+
+A: Compatible wallets include MetaMask, Trust Wallet, and other wallets that support ERC20 tokens.
+
+Q: What makes Turbo Token unique compared to other meme coins?
+
+A: Turbo Token stands out due to its innovative AI initiation, transparent approach, and dedicated community.
+
+
+
+Contact
+If you have any questions or concerns, please feel free to reach out to our team:
+
+Email: turbotoadtoken@gmail.com
+
+Twitter: @TurboToadToken
+Discord: https://discord.gg/FYdKKmV3CU 
+
+
+Contract details here:
+https://etherscan.io/address/0xA35923162C49cF95e6BF26623385eb431ad920D3
+
+
+Discalimer** The content on this website is for informational purposes only and does not constitute financial, investment, or other professional advice. 
+Investing in cryptocurrencies carries inherent risks, and you should perform your own research before making any decisions. 
+TurboToadToken and its team members are not responsible for any losses or damages that may occur as a result of using the information provided on this website. 
+

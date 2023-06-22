@@ -1,0 +1,234 @@
+
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.0;
+
+contract MyContract {
+
+
+
+    bool private zLocked;
+    modifier mLocked {
+        zLocked = true;
+        _;
+        zLocked = false;
+    } 
+
+    // 0 rer l
+    // 1 zro1 l
+    // 2 ser0 l
+    // 3 ser1 l
+    // 4 ser2 l
+    mapping(address => bool[5]) private myAssBol;
+
+    // 0 rer l & c
+    // 1 zro1 l & c
+    // 2 ser0 l & c
+    // 3 ser1 l & c
+    // 4 ser2 l & c
+    mapping(uint256 => address[]) private myUntAss;
+ 
+    // 0 zro1 l & c
+    // 1 lel1 l & c to 
+    // 10 lel10 l & c
+    mapping(address => mapping(uint256 => address[])) private myAssUntAss; 
+
+    // 0 tal ece pts c
+    // 1 tal sing1 pts c
+    // 2 tal sing1claimed pts c
+    // 3 tal hest1 pts c
+    // 4 tal hest1claimed pts c
+    // 5 tal gmecrd1 pts c
+    // 6 tal gmecrd1claimed pts c
+    mapping(uint256 => uint256) private myUntUnt; 
+
+    // 0 ial exce pts c
+    // 1 tal sing1 pts c
+    // 2 tal sing1claimed pts c
+    // 3 tal hest1 pts c
+    // 4 tal hest1claimed pts c
+    // 5 tal gmecrd1 pts c
+    // 6 tal gmecrd1claimed pts c
+    mapping(address => uint256[]) private myAssUnt; 
+
+    struct MYMR {
+        uint256 nr;
+        string ne;
+        string dn;
+        uint256[] it;
+        string[] sl;
+        address[] ae;
+    }
+    mapping(address => MYMR) private myMRM; 
+
+    struct MYPE {
+        uint256 nr;
+        string ne;
+        string dn;
+        uint256[] rd;
+    }
+    mapping(uint256 => MYPE[]) private myPEM;
+
+    address private zTp;
+    address private zNe;
+
+
+
+    constructor() {
+        zTp = msg.sender;
+        zNe = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
+
+    } 
+
+
+
+    function zInit() public { 
+        uint256[] memory aadd1 = new uint256[](5); aadd1[0] = 1; aadd1[1] = 0; aadd1[2] = 0; aadd1[3] = 0; aadd1[4] = 0;
+        string[] memory aaee1 = new string[](1); aaee1[0] = "Tp";
+        address[] memory aaff1 = new address[](12); aaff1[0] = zTp; aaff1[1] = zTp; aaff1[2] = zTp; aaff1[3] = zTp; aaff1[4] = zTp; aaff1[5] = zTp; aaff1[6] = zTp; aaff1[7] = zTp; aaff1[8] = zTp; aaff1[9] = zTp; aaff1[10] = zTp; aaff1[11] = zTp;
+        MYMR memory nwea = MYMR(0, "", "", aadd1, aaee1, aaff1); 
+        myAssBol[zTp][0] = true; myUntAss[0].push(zTp); myAssBol[zTp][1] = false; myAssBol[zTp][2] = true; myUntAss[2].push(zTp); myAssBol[zTp][3] = true; myUntAss[3].push(zTp); myAssBol[zTp][4] = true; myUntAss[4].push(zTp);
+        myMRM[zTp] = nwea;
+
+        uint256[] memory aadd2 = new uint256[](5); aadd2[0] = 1; aadd2[1] = 0; aadd2[2] = 0; aadd2[3] = 0; aadd2[4] = 0;
+        string[] memory aaee2 = new string[](1); aaee2[0] = "Tp";
+        address[] memory aaff2 = new address[](12); aaff2[0] = zTp; aaff2[1] = zNe; aaff2[2] = zTp; aaff2[3] = zTp; aaff2[4] = zTp; aaff2[5] = zTp; aaff2[6] = zTp; aaff2[7] = zTp; aaff2[8] = zTp; aaff2[9] = zTp; aaff2[10] = zTp; aaff2[11] = zTp;  
+        MYMR memory nweb = MYMR(0, "", "", aadd2, aaee2, aaff2);
+        myAssBol[zTp][0] = true; myUntAss[0].push(zNe); myAssBol[zTp][1] = true; myUntAss[1].push(zNe); myAssBol[zNe][2] = true; myUntAss[2].push(zNe); myAssBol[zNe][3] = true; myUntAss[3].push(zNe); myAssBol[zNe][4] = true; myUntAss[4].push(zNe);
+        myAssUntAss[zTp][0].push(zNe); myAssUntAss[zTp][1].push(zNe); myAssUntAss[zTp][2].push(zNe); myAssUntAss[zTp][3].push(zNe); myAssUntAss[zTp][4].push(zNe); myAssUntAss[zTp][5].push(zNe); myAssUntAss[zTp][6].push(zNe); myAssUntAss[zTp][7].push(zNe); myAssUntAss[zTp][8].push(zNe); myAssUntAss[zTp][9].push(zNe); myAssUntAss[zTp][10].push(zNe);
+        myMRM[zNe] = nweb; 
+    }
+
+
+    function zAddressInfo(uint256 aa) public view returns (address,address,address) {
+        return (msg.sender, address(this), address(0));
+    }
+    function zMemberJoin(address aa, uint256 bb, uint256 cc, uint256 dd) public mLocked {
+        require(!myAssBol[msg.sender][0], "Invalid - Already Registered");
+        require(aa != msg.sender, "Invalid - Address");
+        bool aaa = _myMRR(aa, bb, cc, dd, msg.sender);
+        require(aaa, "Invalid");
+    }
+    function zMemberShow(address aa) public view returns (uint256, string memory, string memory, string[] memory, address[] memory) {
+        MYMR memory dd = myMRM[aa];
+        return (dd.nr, dd.ne, dd.dn, dd.sl, dd.ae);
+    }
+
+
+
+    function zUntAssCount(uint256 aa) public view returns (uint256) {
+        require(myAssBol[msg.sender][4], "Invalid - S2");
+        return myUntAss[aa].length;
+    } 
+    function zUntAssList(uint256 aa) public view returns (address[] memory) {
+        require(myAssBol[msg.sender][4], "Invalid - S2");
+        return myUntAss[aa];
+    } 
+
+
+
+    function zAssUntAssList(address aa, uint256 bb) public view returns (address[] memory) { 
+        return myAssUntAss[aa][bb];
+    }
+    function zAssUntAssCount(address aa, uint256 bb) public view returns (uint256) { 
+        return myAssUntAss[aa][bb].length;
+    }
+
+
+
+    function myASU(address[] memory aa, uint256[] memory bb, bool[] memory cc) public {
+        require(myAssBol[msg.sender][4], "Invalid - S2");
+        require(aa.length == bb.length && bb.length == cc.length, "Invalid - Input length mismatch");
+
+        for (uint256 i = 0; i < aa.length; i++) {
+            myAssBol[aa[i]][bb[i]] = cc[i];
+        }
+    } 
+    function myASG(address aa, uint256 bb) public view returns (bool) {
+        require(myAssBol[msg.sender][4], "Invalid - S2");
+        return myAssBol[aa][bb];
+    }
+
+
+
+    function _myMRR(address aa, uint256 bb, uint256 cc, uint256 dd, address ee) internal returns (bool) {
+        require(aa != address(0), "Invalid - AZ");
+        require(aa != address(this), "Invalid - AT");
+        require(bb != 0 && cc != 0 && dd != 0, "Invalid - AN");
+        require(!myAssBol[ee][0], "Invalid - AR");
+        // remarks
+        string[] memory _sl = new string[](1);
+        // check if myAssBol 1
+        if (myAssBol[ee][1]) {
+            // if true
+            aa = zTp;
+            _sl[0] = "Z1";
+            myAssBol[ee][1] = true; myUntAss[1].push(ee);
+            myAssBol[ee][2] = false; 
+            myAssBol[ee][3] = false; 
+            myAssBol[ee][4] = false; 
+        } else {
+            // else
+            require(aa != zTp, "Invalid - AST");
+            require(myAssBol[aa][0], "Invalid - AS");
+            _sl[0] = "Mr";
+            myAssBol[ee][1] = false; 
+            myAssBol[ee][2] = false; 
+            myAssBol[ee][3] = false; 
+            myAssBol[ee][4] = false; 
+        }
+        MYMR memory nwdb = myMRM[aa];
+        myAssBol[ee][0] = true; myUntAss[0].push(ee);
+        uint256 _nr = myUntAss[0].length;
+        string memory _ne = "";
+        string memory _dn = "";
+        // aemr,cldn,itpl1,itpl2,itpl3
+        uint256[] memory _it = new uint256[](5); _it[0] = 1; _it[1] = 0; _it[2] = bb; _it[3] = cc; _it[4] = dd;
+        // aezo,yrsf,ae1,ae2,ae3,ae4,ae5,ae6,ae7,ae8,ae9,ae10
+        address[] memory _ae = new address[](12); _ae[0] = nwdb.ae[0]; _ae[1] = ee; _ae[2] = nwdb.ae[1]; _ae[3] = nwdb.ae[2]; _ae[4] = nwdb.ae[3]; _ae[5] = nwdb.ae[4]; _ae[6] = nwdb.ae[5]; _ae[7] = nwdb.ae[6]; _ae[8] = nwdb.ae[7]; _ae[9] = nwdb.ae[8]; _ae[10] = nwdb.ae[9]; _ae[11] = nwdb.ae[10];
+        uint256[] memory _t1 = new uint256[](0); _it[0] = 0;
+        _myAssUntP(_ae, ee, _t1);
+        _myAssUntAssP(_ae, ee);
+        MYMR memory nwda = MYMR(_nr, _ne, _dn, _it, _sl, _ae);
+        myMRM[ee] = nwda;
+        return true;
+    }
+    function _myAssUntAssP(address[] memory _ae, address ee) internal  {
+        myAssUntAss[_ae[0]][0].push(ee); myAssUntAss[_ae[2]][1].push(ee); myAssUntAss[_ae[3]][2].push(ee); myAssUntAss[_ae[4]][3].push(ee); myAssUntAss[_ae[5]][4].push(ee); myAssUntAss[_ae[6]][5].push(ee); myAssUntAss[_ae[7]][6].push(ee); myAssUntAss[_ae[8]][7].push(ee); myAssUntAss[_ae[9]][8].push(ee); myAssUntAss[_ae[10]][9].push(ee); myAssUntAss[_ae[11]][10].push(ee);
+    }
+    function _myAssUntP(address[] memory _ae, address ee, uint256[] memory _t1) internal {
+        uint256 aaa = 1;
+        uint256 ccc = 2;
+        uint256 bbb;
+        for (uint256 i = 0; i < _t1.length; i++) { 
+            bbb += aaa; myAssUnt[_ae[0]][_t1[i]] += aaa; 
+            bbb += ccc; myAssUnt[_ae[2]][_t1[i]] += ccc;
+            bbb += aaa; myAssUnt[_ae[3]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[4]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[5]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[6]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[7]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[8]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[9]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[10]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[_ae[11]][_t1[i]] += aaa;
+            bbb += aaa; myAssUnt[ee][_t1[i]] += aaa;
+            myUntUnt[_t1[i]] += bbb;
+        }
+    }
+
+    function myPEN(uint256 aa, uint256 bb, string memory cc, string memory dd, uint256[] memory ee) public {
+        MYPE memory nwda;
+        nwda.nr = bb;
+        nwda.ne = cc;
+        nwda.dn = dd;
+        nwda.rd = ee;
+        myPEM[aa].push(nwda);
+    }
+    function myPEG(uint256 aa, uint256 bb) public view returns (uint256, string memory, string memory, uint256[] memory) {
+        require(bb < myPEM[aa].length, "Invalid");
+        MYPE memory data = myPEM[aa][bb];
+        return (data.nr, data.ne, data.dn, data.rd);
+    }
+
+}

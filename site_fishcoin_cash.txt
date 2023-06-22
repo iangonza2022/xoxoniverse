@@ -1,0 +1,45 @@
+
+
+fishcoin.cash
+
+Welcome to $FISH 
+
+Redefining gamification with Tokenomics!
+
+We are more than just a token, we created an engaging fishing game that blends the world of blockchain and fun. Join us in the pursuit of adventures as we cast our nets together.
+
+
+
+
+
+How To Buy
+
+1 Create a Wallet
+Download metamask or your wallet of choice from the app store or google play store for free.
+Desktop users, download the google chrome extension by going to metamask.io.
+
+2 Get Some ETH
+Have ETH in your wallet to switch to $FISH.
+If you don’t have any ETH, you can buy directly on metamask, transfer from another wallet, or buy on another exchange and send it to your wallet.
+
+3 Go to Uniswap
+Connect to Uniswap. Go to app.uniswap.org in google chrome or on the browser inside your Metamask app. Connect your wallet.
+Paste the $FISH token address into Uniswap, select FISH, and confirm. When Metamask prompts you for a wallet signature, sign.
+
+4 Switch ETH for $FISH
+Switch ETH for $FISH. We have ZERO taxes so you don’t need to worry about buying with a specific slippage, although you may need to use slippage during times of market volatility.
+
+
+
+
+Tokenomics
+
+70% of pre-sale funds used for liquidity
+
+Remainder of pre-sale funds kept in Ethereum only for exchange listings, project development, marketing, and operations payment.
+
+0% percent of token supply allocated to the team to prevent negatively impacting on the project.
+
+Copyright © 2023 FISH. All rights reserved.   
+
+
